@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8 />
+		<title>Fidy Wallet</title>
+		
+		<!-- Use Zepto for best performance on WebKit based browser -->
+		<script src="scripts/Flux-Slider-master/js/zepto/zepto.js" type="text/javascript" charset="utf-8"></script>
+		
+		<!-- Use jQuery for best compatibility with other CSS3 enabled browsers -->
+		<script src="scripts/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="scripts/hammer.js"></script>
+		
+		<script src="scripts/Flux-Slider-master/js/flux.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+			$(function(){
+				if(!flux.browser.supportsTransitions)
+					alert("Flux Slider requires a browser that supports CSS3 transitions");
+					
+				  window.myFlux = new flux.slider('#slider', {
+				        autoplay: false,
+				        pagination: false
+				    });
+				
+				var $slides = $('.container');
+				Hammer($slides[0]).on("swipeleft", function(e) {
+					window.myFlux.next('slide');
+			      });
+			
+			      Hammer($slides[0]).on("swiperight", function(e) {
+					window.myFlux.prev('slide');
+			      });
+			     
+			});
+		</script>
+		<style>
+			.fluxslider {
+				width:100%!important;
+			}
+		</style>
+	</head>
+	<body style="margin:0;background-color: #333;">
+		<section class="container" style="width: 100%;">
+			<div id="slider">
+				<img src="images/tutorial/fw_tutorial_01.png" width="600" alt="img" >
+			  	<img src="images/tutorial/fw_tutorial_02.png" width="600" alt="img" >
+			  	<img src="images/tutorial/fw_tutorial_03.png" width="600" alt="img" >
+				<img src="images/tutorial/fw_tutorial_04.png" width="600" alt="img" >
+				<img src="images/tutorial/fw_tutorial_05.png" width="600" alt="img" >
+				<img src="images/tutorial/fw_tutorial_06.png" width="600" alt="img" >
+				<img src="images/tutorial/fw_tutorial_07.png" width="600" alt="img" >
+				<img src="images/tutorial/fw_tutorial_08.png" width="600" alt="img" >
+				<img src="images/tutorial/fw_tutorial_09.png" width="600" alt="img" >
+				<img src="images/tutorial/fw_tutorial_10.png" width="600" alt="img" >
+				<img src="images/tutorial/fw_tutorial_11.png" width="600" alt="img" >
+			</div>
+		</section>
+	</body>
+</html>

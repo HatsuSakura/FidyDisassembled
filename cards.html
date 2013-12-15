@@ -1,0 +1,426 @@
+<!DOCTYPE html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--Declare page as mobile friendly --> 
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0"/>
+<!-- Declare page as iDevice WebApp friendly -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<!-- iDevice WebApp Splash Screen, Regular Icon, iPhone, iPad, iPod Retina Icons -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/splash/splash-icon.png"> 
+<!-- iPhone 3, 3Gs -->
+<link rel="apple-touch-startup-image" href="images/splash/splash-screen.png" 			media="screen and (max-device-width: 320px)" /> 
+<!-- iPhone 4 -->
+<link rel="apple-touch-startup-image" href="images/splash/splash-screen@2x.png" 		media="(max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2)" /> 
+<!-- iPhone 5 -->
+<link rel="apple-touch-startup-image" sizes="640x1096" href="images/splash/splash-screen@3x.png" />
+
+<!-- Page Title -->
+<title>Fidy Wallet</title>
+
+<!-- Stylesheet Load -->
+<link href="styles/style.css"					rel="stylesheet" type="text/css">
+<link href="styles/framework-style.css" 		rel="stylesheet" type="text/css">
+<link href="styles/framework.css" 				rel="stylesheet" type="text/css">
+<link href="styles/bxslider.css"				rel="stylesheet" type="text/css">
+<link href="styles/swipebox.css"				rel="stylesheet" type="text/css">
+<link href="styles/icons.css"					rel="stylesheet" type="text/css">
+<link href="styles/retina.css" 					rel="stylesheet" type="text/css" media="only screen and (-webkit-min-device-pixel-ratio: 2)" />
+
+<!--Page Scripts Load -->
+<script src="scripts/jquery.min.js"							type="text/javascript"></script>	
+<script src="scripts/hammer.js"								type="text/javascript"></script>	
+<script src="scripts/jquery-ui-min.js"  					type="text/javascript"></script>
+<script src="scripts/jQuery.fastClick.js"					type="text/javascript"></script>
+<script src='scripts/html5sql.js'							type='text/javascript'></script>
+<script src="scripts/subscribe.js"							type="text/javascript"></script>
+<script src="scripts/contact.js"							type="text/javascript"></script>
+<script src="scripts/jquery.swipebox.js" 					type="text/javascript"></script>
+<script src="scripts/bxslider.js"							type="text/javascript"></script>
+<script src="scripts/retina.js"								type="text/javascript"></script>
+<script src="scripts/custom.js"								type="text/javascript"></script>
+<script src="scripts/framework.js"							type="text/javascript"></script>
+<script src="scripts/jquery.transit.min.js"					type="text/javascript"></script>
+<script src="scripts/db.js"									type="text/javascript"></script>
+<script src="scripts/store.js"								type="text/javascript"></script>
+<script src="scripts/behavior.js"							type="text/javascript"></script>
+<script src="scripts/standard.js"							type="text/javascript"></script>
+<script src="scripts/fn_comunication.js"							type="text/javascript"></script>
+<script>
+function resetUI() {
+	$('.BoxWrapperScore').hide();
+	$('.BoxWrapperConfirm').hide();
+	$('.BoxWrapperPin').show();
+	$('.pin').val('');
+	$('#punteggio').val('');
+	localStorage.setItem("numeroPinErrati","0");
+};
+
+
+$(document).ready(function(){
+	var id=getUrlVars()["id"];
+	console.log("var get:"+id);
+	localStorage.setItem("numeroPinErrati","0"); //preset variabile per controllo pin errati
+	
+	//compilo il numero tessera
+	$('.numeroTessera').html("Numero tessera: "+localStorage.getItem("id_user"));
+	
+	//Store link
+	$('.icon-right-menu').attr("href", "stores.html?id="+id);
+	
+	//recupero i dati dello store
+	//Apro il Db//
+	open_db();
+	
+	var storePin;
+	var score;
+	db_query("SELECT * FROM storeList WHERE id_store='"+id+"'",function(risultati){
+		$.each(risultati, function(i,item){
+			$('#nomeNegozio').html(item.nome);
+			$('#cittaProvincia').html(item.citta+", "+item.provincia);
+			$('#descrizione').html(item.descrizione);
+			$('#descrizioneConversione').html(item.descrizioneConversione);
+			$('#telefono').html(item.telefono);
+			$('#email').html(item.email);
+			score=item.score;
+			$('#scoreApear').html(score);
+			storePin=item.pin;
+		});
+	});
+	
+	//__________________PIN Aggiunta punti_______________________//
+	$('#pinField').keyup(function() {
+     	console.log("cambiato Last (aggiunta punti):"+$('#pinField').val());
+     	var numeroPinErrati=parseInt(localStorage.getItem("numeroPinErrati"));
+		
+     	if($('#pinField').val().length>3)
+     	{
+     		if(numeroPinErrati>2)
+     		sendAlertPin("Aggiunta punti shop: "+id);
+     		
+     		//valido il pin
+     		var inseredPin = $('#pinField').val();
+     		if(storePin==inseredPin)
+     		{
+     			$('.BoxWrapperPin').hide();
+     			$('.BoxWrapperScore').show();
+     		}
+     		else
+     		{
+     			localStorage.setItem("numeroPinErrati",numeroPinErrati+1);
+     			$('#pinError').show();
+     			$('#pinNotice').hide();
+     			$('#pinField').val('');
+     		}
+     	}
+	});
+	//__________________PIN richiesta regalo_______________________//
+	$('#pinFieldRegalo').keyup(function() {
+     	console.log("cambiato Last (richiesta premio):"+$('#pinFieldRegalo').val());
+     	var numeroPinErrati=parseInt(localStorage.getItem("numeroPinErrati"));
+     	
+     	if($('#pinFieldRegalo').val().length>3)
+     	{
+     		if(numeroPinErrati>2)
+     		sendAlertPin("richiesta regalo shop: "+id);
+     		
+     		//valido il pin
+     		var inseredPin = $('#pinFieldRegalo').val();
+     		if(storePin==inseredPin)
+     		{
+     			$('.BoxWrapperPinRegalo').hide();
+     			$('.BoxWrapperScoreRegalo').show();
+     		}
+     		else
+     		{
+     			localStorage.setItem("numeroPinErrati",numeroPinErrati+1);
+     			$('#pinErrorRegalo').show();
+     			$('#pinNoticeRegalo').hide();
+     			$('#pinFieldRegalo').val('');
+     		}
+     	}
+	});
+	
+	//__________________ADD SCORE_______________________//
+	//cmbio icona quando inizio a digitare
+	$('.numbers').keyup(function() {
+		if($('#punteggio').val()!='')
+		{
+			$('#btnPuntiSubmit').attr("src", "images/fw_icons/fw_confirm_on.png");
+			$('#btnPuntiSubmit').addClass('btnActive');
+		}
+		else
+		{
+			$('#btnPuntiSubmit').attr("src", "images/fw_icons/fw_confirm_off.png");
+			$('#btnPuntiSubmit').removeClass('btnActive');
+		}
+	});
+	
+	$('#btnPuntiSubmit').fastClick(function() {
+		event.preventDefault();
+		console.log("clicckato");
+		$('.BoxWrapperPin').hide();
+		$('.BoxWrapperScore').hide();
+		$('#pinNotice').hide();
+		$('.BoxWrapperConfirm').show();
+		var punteggioAggiunto = $('#punteggio').val();
+		
+		setTimeout(function () {
+		   jQuery('#cboxClose').trigger('click');
+		}, 1000);
+		
+		$.ajax({
+		url: 'http://srv.fidywallet.com/api/client/API_comunication.php?act=addScore&store='+id+'&punteggio='+punteggioAggiunto+'&user='+localStorage.getItem("id_user"),
+		dataType: 'jsonp',
+		jsonp: 'jsoncallback',
+		timeout: 5000,
+		success: function(data, status){
+			refreshScore(id);
+			/*
+			setTimeout(function () {
+				var newScore=(parseFloat(score)+parseFloat(punteggioAggiunto));
+				console.log("punteggi:"+score+" "+punteggioAggiunto);
+				//$('#score').html(newScore);
+				//resetUI();
+			}, 1500);
+			*/
+		},
+		error: function(ts){
+
+		}
+	});
+	});
+	
+	//__________________RICHIEDI PREMIO_______________________//
+	//cmbio icona quando inizio a digitare
+	$('.numbers').keyup(function() {
+		if($('#punteggioRegalo').val()!='')
+		{
+			$('#btnPuntiSubmitRegalo').attr("src", "images/fw_icons/fw_confirm_on.png");
+			$('#btnPuntiSubmitRegalo').addClass('btnActive');
+		}
+		else
+		{
+			$('#btnPuntiSubmitRegalo').attr("src", "images/fw_icons/fw_confirm_off.png");
+			$('#btnPuntiSubmitRegalo').removeClass('btnActive');
+		}
+	});
+	
+	$('#btnPuntiSubmitRegalo').fastClick(function() {
+		console.log("clicckato");
+		$('.BoxWrapperPinRegalo').hide();
+		$('.BoxWrapperScoreRegalo').hide();
+		$('#pinNoticeRegalo').hide();
+		$('.BoxWrapperConfirmRegalo').show();
+		setTimeout(function () {
+		   jQuery('#cboxClose').trigger('click');
+		}, 1000);
+		
+		$.ajax({
+		url: 'http://srv.fidywallet.com/api/client/API_comunication.php?act=subScore&store='+id+'&punteggio='+$('#punteggioRegalo').val()+'&user='+localStorage.getItem("id_user"),
+		dataType: 'jsonp',
+		jsonp: 'jsoncallback',
+		timeout: 5000,
+		success: function(data, status){
+			refreshScore (id);
+			/*
+			setTimeout(function () {
+				var newScore=(parseFloat(score)+parseFloat($('#punteggioRegalo').val()));
+				$('#score').html(newScore);
+			}, 1500);
+			*/
+		},
+		error: function(ts){
+
+		}
+	});
+	});
+	
+	
+	//----------- OVERLAY -------------//
+	
+	
+	$('.btnOverlay').click(function() {
+		event.stopPropagation();
+		var xDelta=($(window).width()/2)-($('.overlayContainer').width()/2);
+		var yDelta=($(window).height()/2)-($('.overlayContainer').height()/2);
+		console.log('Open #'+this.id+'.overlayContainer');
+		
+		$('#overlay'+this.id+'.overlayContainer').transition({
+			left: xDelta+'px',
+			top: yDelta+'px'
+			}, 300, 'easeInOutExpo', function(){
+		});
+	});
+	$('html, .close').click(function() {
+		resetUI();
+		$('.overlayContainer').transition({
+			left: '4000px'
+			}, 300, 'easeInOutExpo', function(){
+		});
+	});
+
+	$('.overlayContainer').click(function(event){
+    	event.stopPropagation();
+	});
+	
+	//adapt overlay on change windows
+	$(window).resize(function(){
+		console.log("modificato window");
+		var NewyDelta=($(window).height()/2)-($('.overlayContainer').height()/2);
+		$('.overlayContainer').transition({
+			top: NewyDelta+'px'
+			}, 300, 'easeInOutExpo', function(){
+		});
+	});
+});
+</script>
+
+</head>
+<body style="width: 100%;">
+
+    <div id="preloader">
+        <div id="status">
+            <p class="center-text">
+                Loading the content...
+                <em>Loading depends on your connection speed!</em>
+            </p>
+        </div>
+    </div>
+<div class="page-wrapper">
+    <div class="header">
+        <a class="icon-left-menu icon-left-menu_on" href="main.html"><img src="images/fw_icons/fw_home.png" alt="img" width="40"></a>
+        <a class="icon-right-menu" href=""><img src="images/fw_icons/fw_store_on.png" alt="img" width="40"></a>
+		<div class="header-text">
+			<strong id="nomeNegozio"></strong>
+        </div>
+	</div>
+    
+	<div class="content" style="position: absolute;top: 50%;margin-top: -105px;width:100%;">
+    	<div class="containerCard" style="height: 300px; text-align: center!important; margin-left:auto; margin-right: auto; ">
+    		<h3 style="margin-bottom: 0px!important;">QUANTI PUNTI HO?</h3><br>
+    		<p id="scoreApear" style="font-size: 10em; overflow: visible; min-height: 1em; padding-top: 45px;" class="points">0</p>
+    		<p style="margin-bottom:0px;">SCEGLI UN'OPZIONE</p><br>
+       		<div style="max-width:270px; display:block; margin-left: auto; margin-right: auto;">
+	            <div class="nav-icon btnOverlay" id="btnPunti"></div>
+	            <div class="nav-icon btnOverlay" id="btnRegali"></div>
+	            <div class="nav-icon btnOverlay" id="btnInfo"></div>
+    		</div>
+    	</div>
+		<div class="numeroTessera" style="width:100%; text-align:center;"></div>
+	</div>
+	
+	<!-- div overlay -->
+    <div class="overlayContainer" id="overlaybtnPunti">
+        <div id="inline_content_info" style="padding:18px; background:#fff;">
+            <h3 style="border-bottom: solid 1px #333; margin-bottom:15px; padding-bottom:10px;">AGGIUNGI PUNTI
+            <img class="close" src="images/fw_icons/FW_close.png" style="width: 30px; float:right; margin-top:-5px; margin-right:-10px;"></h3>
+            <div class="BoxWrapperPin">
+	            <p>Passa il tuo telefono al negoziante così potrà inserire il codice pin.</p>
+	            <form>
+	                <input type="number" maxlength="4" class="numbers pin pin1" name="pin" id="pinField" style="width:100%;">
+	            </form>
+	            <p style="margin-top:15px; margin-bottom:0px;" id="pinNotice">Per annullare l'operazione, clicca all'esterno del box.</p>
+	            <p style="margin-top:15px; margin-bottom:0px; color:#FF0000; display: none;" id="pinError">Codice Pin errato. Riprova! </p>
+            </div>
+            <div class="BoxWrapperScore" style="display:none;">
+                <p>Quanti punti vuoi aggiungere alla tua fidelity card?</p>
+                <form>
+                    <div class="numbers" style="float:left; border:none">+</div>
+                    <input type="number" class="numbers" id="punteggio" name="punteggio" style="width:140px;">
+                    <div style="float:left; margin-left:15px; margin-top:10px; border:none; float:left;"><img id="btnPuntiSubmit" src="images/fw_icons/fw_confirm_off.png" alt="img" width="32"></div>
+                </form>
+                <!--<p style="margin-top:15px; margin-bottom:0px; color:#00CC33;">Operazione avvenuta con successo!</p>-->
+            </div>
+            <div class="BoxWrapperConfirm" style="display:none;">
+                <p style="margin-top:15px; margin-bottom:0px; color:#00CC33;">Operazione avvenuta con successo!</p>
+            </div>
+        </div>
+    </div>
+    <div class="overlayContainer" id="overlaybtnRegali">
+        <div id="inline_content_info" style="padding:18px; background:#fff;">
+            <h3 style="border-bottom: solid 1px #333; margin-bottom:15px; padding-bottom:10px;">RICHIEDI UN PREMIO
+            <img class="close" src="images/fw_icons/FW_close.png" style="width: 30px; float:right; margin-top:-5px; margin-right:-10px;"></h3>
+            <div class="BoxWrapperPinRegalo">
+	                <p>Passa il tuo telefono al negoziante così potrà inserire il codice pin.</p>
+	                <form>
+	                    <input type="number" maxlength="4" class="numbers pin pin1Regalo" name="pin" id="pinFieldRegalo" style="width:100%;">
+	                </form>
+	                <p style="margin-top:15px; margin-bottom:0px;" id="pinNoticeRegalo">Per annullare l'operazione, clicca all'esterno del box.</p>
+	                <p style="margin-top:15px; margin-bottom:0px; color:#FF0000; display: none;" id="pinErrorRegalo">Codice Pin errato. Riprova! </p>
+            </div>
+            <div class="BoxWrapperScoreRegalo" style="display:none;">
+	                <p>Quanti punti vuoi aggiungere alla tua fidelity card?</p>
+	                <form>
+	                    <div class="numbers" style="float:left; border:none">-</div>
+	                    <input type="number" class="numbers" id="punteggioRegalo" name="punteggioRegalo" style="width:140px;">
+	                    <div style="float:left; margin-left:15px; margin-top:10px; border:none; float:left;"><img id="btnPuntiSubmitRegalo" src="images/fw_icons/fw_confirm_off.png" alt="img" width="32"></div>
+	                </form>
+	                <!--<p style="margin-top:15px; margin-bottom:0px; color:#00CC33;">Operazione avvenuta con successo!</p>-->
+                </div>
+            <div class="BoxWrapperConfirmRegalo" style="display:none;">
+                	<p style="margin-top:15px; margin-bottom:0px; color:#00CC33;">Operazione avvenuta con successo!</p>
+			</div>
+        </div>
+    </div>
+    <div class="overlayContainer" id="overlaybtnInfo">
+        <div id="inline_content_info" style="padding:18px; background:#fff;">
+            <h3 style="border-bottom: solid 1px #333; margin-bottom:15px; padding-bottom:10px;">INFO SCHEDA PUNTI
+            <img class="close" src="images/fw_icons/FW_close.png" style="width: 30px; float:right; margin-top:-5px; margin-right:-10px;"></h3>
+            <p id="descrizioneConversione"></p>
+        </div>
+    </div>
+        
+</div>
+
+<div class="page-sidebar">
+	<div class="page-sidebar-scroll"> 
+        <a href="https://www.facebook.com/FidyWallet" class="sidebar-button"><em class="sidebar-button-facebook">FACEBOOK</em></a>
+        <a href="https://twitter.com/FidyWallet" class="sidebar-button"><em class="sidebar-button-twitter">TWITTER</em></a>
+        <a href="https://plus.google.com/115259423260569257757" class="sidebar-button"><em class="sidebar-button-googleplus">GOOGLE +</em></a>
+        <div class="clear"></div>
+         
+		<img class="sidebar-logo" src="images/logo_menu.png" alt="img">
+        <div class="menu">         
+        	<div class="menu-item">
+            	<strong class="home-icon"></strong>
+                <a class="menu-enabled" href="main.html">Negozi</a>
+            </div> 
+            <!--
+            <div class="menu-item">
+                <strong class="profile-icon"></strong>
+                <a class="menu-disabled" href="#">Profilo</a>
+            </div>
+            -->
+            <div class="menu-item">
+                <strong class="about-icon"></strong>
+                <a class="menu-disabled" href="about_fidy.html">About FIDY WALLET</a>
+                <div class="clear"></div>
+                <div class="submenu">
+                	<a href="#">Cos'è Fidy Wallet</a><em class="submenu-decoration"></em>
+                    <a href="#">FAQ</a><em class="submenu-decoration"></em>
+                    <a href="#">Contattaci</a>
+                </div>
+			</div>
+			<div class="menu-item">
+            	<strong class="home-icon"></strong>
+                <a class="menu-disabled" href="tutorial.html">Tutorial</a>
+            </div> 
+            <div class="menu-item">
+            	<strong class="logout-icon"></strong>
+                <a class="menu-disabled" href="login.html?logout=1">LOGOUT</a>
+            </div>
+		</div>
+        <!--
+        <p class="sidebar-heading">NOVITÀ</p>
+        <div class="sidebar-decoration"></div>
+        <div class="sidebar-updates">
+        	<a href="#" class="update-box update-news">AGGIUNTI NUOVI STORE<br/>15 OTT 2013</a><div class="sidebar-decoration"></div>			
+            <a href="#" class="update-box update-blog">VERSIONE ALPHA ONLINE<br>01 OTT 2013</a><div class="sidebar-decoration"></div>
+        </div> 
+        --> 
+        <div class="clear"></div>
+        
+        <p class="sidebar-copyright">Copyright 2013. All rights reserved!</p>     
+	</div>
+</div>
+</body>
+</html>

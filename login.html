@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--Favicon shortcut link-->
+<link type="image/x-icon"  		rel="shortcut icon"		href="images/splash/favicon.ico" />
+<link type="image/x-icon"  		rel="icon"		   		href="images/splash/favicon.ico" />
+<!--Declare page as mobile friendly --> 
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0"/>
+<!-- Declare page as iDevice WebApp friendly -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<!-- iDevice WebApp Splash Screen, Regular Icon, iPhone, iPad, iPod Retina Icons -->
+<link rel="apple-touch-icon" sizes="114x114" href="images/splash/splash-icon.png"> 
+<link rel="apple-touch-startup-image" href="images/splash/splash-screen.png" media="screen and (max-device-width: 320px)" /> 
+<link rel="apple-touch-startup-image" href="images/splash/splash-screen@2x.png" media="(max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2)" /> 
+<link rel="apple-touch-startup-image" href="images/splash/splash-screen@3x.png" sizes="640x1096">
+
+<!-- Page Title -->
+<title>Fidy Wallet</title>
+
+<!-- Stylesheet Load -->
+<link href="styles/style.css"								rel="stylesheet" type="text/css">
+<link href="styles/framework-style.css" 					rel="stylesheet" type="text/css">
+<link href="styles/framework.css" 							rel="stylesheet" type="text/css">
+<link href="styles/bxslider.css"							rel="stylesheet" type="text/css">
+<link href="styles/swipebox.css"							rel="stylesheet" type="text/css">
+<link href="styles/icons.css"								rel="stylesheet" type="text/css">
+<link href="styles/retina.css" 								rel="stylesheet" type="text/css" media="only screen and (-webkit-min-device-pixel-ratio: 2)" />
+
+
+<!--Page Scripts Load -->
+<script src="scripts/jquery.min.js"							type="text/javascript"></script>	
+<script src="scripts/hammer.js"								type="text/javascript"></script>	
+<script src="scripts/jquery-ui-min.js"  					type="text/javascript"></script>
+<script src="scripts/jQuery.fastClick.js"					type="text/javascript"></script>
+<script src='scripts/html5sql.js'							type='text/javascript'></script>
+<script src="scripts/subscribe.js"							type="text/javascript"></script>
+<script src="scripts/jquery.swipebox.js" 					type="text/javascript"></script>
+<script src="scripts/bxslider.js"							type="text/javascript"></script>
+<script src="scripts/retina.js"								type="text/javascript"></script>
+<script src="scripts/custom.js"								type="text/javascript"></script>
+<script src="scripts/framework.js"							type="text/javascript"></script>
+<script src="scripts/jquery.transit.min.js"					type="text/javascript"></script>
+<script src="scripts/db.js"									type="text/javascript"></script>
+<script src="scripts/store.js"								type="text/javascript"></script>
+<script src="scripts/behavior.js"							type="text/javascript"></script>
+<script src="scripts/standard.js"							type="text/javascript"></script>
+<script src="scripts/fn_comunication.js"					type="text/javascript"></script>
+<script src="scripts/md5.js"								type="text/javascript"></script>
+<script src="cdv-plugin-fb-connect.js"></script>
+<script src="facebook-js-sdk.js"></script>
+<script src="scripts/fn_fb.js"></script>
+
+<!-- include PhoneGap from PhoneGapBuild -->
+<script src="phonegap.js"></script>
+
+
+<script>
+	function init() {
+		
+		// Wait for PhoneGap to load
+		document.addEventListener("deviceready", onDeviceReady, false);
+		
+		// PhoneGap is loaded and it is now safe to make calls PhoneGap methods
+		function onDeviceReady() {
+			
+		};
+		
+		document.addEventListener("deviceready", getDeviceProperty, false);
+		function getDeviceProperty()
+		{
+		     var deviceOS  = device.platform  ;  //fetch the device operating system
+		     var deviceOSVersion = device.version ;  //fetch the device OS version
+		     //alert("Device OS: " + deviceOS); 
+		     //alert("Device OS Version: " + deviceOSVersion);
+		     var deviceOSVersionSplit = deviceOSVersion.split(".");
+		     //alert("Mostro l'fb login? OS:"+deviceOS+" version full: "+deviceOSVersion+" version:"+deviceOSVersionSplit[0]);
+		     if(deviceOS=='iOS' && deviceOSVersionSplit[0]<='6')
+		     {
+		     	$(".fbLogin").hide();
+		     }
+		}
+		/*
+		if(localStorage.getItem("id_user")!='') //If the user was logged before bypass FB login
+		{
+			var id_user = localStorage.getItem("id_user");
+			//Check and set the user as online. 
+			//If true go to home.html.
+			//If false do nothing and let the login page to appear
+			canLogin(id_user);
+		}
+		else
+		var needToLogin = '1';
+		*/
+		//login();
+	}
+</script>
+
+<script>
+$(document).ready(function(){
+	initStoreDb();
+	var logout=getUrlVars()["logout"];
+	console.log("logout:"+logout);
+	if(logout==1)
+	localStorage.clear();
+	
+	if(localStorage.getItem("LoginUsername")!=null && localStorage.getItem("LoginPassword")!=null)
+	{
+		Login(localStorage.getItem("LoginUsername"),localStorage.getItem("LoginPassword"));
+		console.log("Provo a fare un login automatico:"+localStorage.getItem("LoginUsername")+" "+localStorage.getItem("LoginPassword"));
+	}
+	
+	
+	//login action
+	$("#contactForm").submit(function(e){
+    	return false;
+	});
+	$('#contactSubmitButton').fastClick(function(){
+		if($('#contactPasswordField').val()!='' && $('#contactNameField').val()!='')
+		{
+			console.log("dati login:"+$('#contactPasswordField').val());
+			var cryptPass = md5($('#contactPasswordField').val());
+			Login($('#contactNameField').val(),cryptPass);
+		}
+		else
+		{
+			$('.formValidationError').show();
+		}
+	});
+	
+	if(localStorage.getItem("loggedMethod")=='fb')
+	{
+		$(".loginLoader").show();
+	}
+});
+
+</script>
+</head>
+<body onload="init()">
+
+<div id="data"></div>
+<div id="fb-root"></div>
+<div id="log"></div>
+<script>
+	            if ((typeof cordova == 'undefined') && (typeof Cordova == 'undefined')) alert('Variable does not exist. Check files');
+	            if (typeof CDV == 'undefined') alert('Variable does not exist. Check CDV');
+	            if (typeof FB == 'undefined') alert('Variable does not exist. Check FB');
+	            
+	            FB.Event.subscribe('auth.login', function(response) {
+		           	//alert('auth.login event');
+		           	//getLoginStatus();
+		           
+		           	//get User data from Facebook
+		           	//$('.loginLoader').show();
+					getMe();
+				});
+				
+				FB.Event.subscribe('auth.logout', function(response) {
+	           		//alert('auth.logout event'); 
+	           		//window.location.replace("main.html"); //redirect to index
+	           	});
+
+	            FB.Event.subscribe('auth.sessionChange', function(response) {
+	            	//alert('auth.sessionChange event');
+	            });
+
+	            FB.Event.subscribe('auth.statusChange', function(response) {
+	           		//alert('auth.statusChange event');
+	           	});
+
+	            function getSession() {
+	                //alert("session: " + JSON.stringify(FB.getSession()));
+	            }
+
+	            document.addEventListener('deviceready', function() {
+	          		try 
+	          		{
+	          			//alert('Device is ready! Make sure you set your app_id below this alert.');
+	          			FB.init({ appId: "314964415312005", nativeInterface: CDV.FB, useCachedDialogs: false });
+	          			//document.getElementById('data').innerHTML = "";
+	          			FB.Event.subscribe('auth.login', function(response) {
+	           				//alert('auth.login event');
+	           				//getLoginStatus();
+	           
+	           				//get User data from Facebook
+							//getMe();
+						});	
+	          		} 
+	          		catch (e)
+	          		{
+	          			//alert(e);
+	          		}
+	          	}, false);
+            </script>
+
+<div id="preloader">
+	<div id="status">
+    	<p class="center-text">
+			Loading the content...
+            <em>Loading depends on your connection speed!</em>
+        </p>
+    </div>
+</div>
+
+<div class="content">
+  <div class="container no-bottom">
+    <div class="heading" style="margin-top:40px;">
+      <div class="heading-left" style="padding-top:3px">
+        <h3>EFFETTUA IL LOGIN</h3>
+      </div>
+      <div class="heading-right"> <img src="images/fw_icons/fw_home.png" alt="img" width="40"> </div>
+    </div>
+  </div>
+  <div class="container no-bottom">
+   	<div class="contact-form no-bottom">
+			<form action="" method="post" class="contactForm" id="contactForm">
+           	  <fieldset>
+              <div class="formValidationError" id="contactNameFieldError" style="display: none;">
+                <div class="small-notification red-notification no-bottom">
+                  <div class="clear"></div>
+					<p>NOME O PASSWORD NON VALIDI</p>
+                </div>
+              </div>
+                    <div class="formFieldWrap">
+                   	  <label class="field-title contactNameField" for="contactNameField">Email:</label>
+                      <input type="text" name="contactNameField" value="" class="contactField requiredField" id="contactNameField"/>
+                    </div>
+                    <div class="formFieldWrap">
+                   	  <label class="field-title contactPasswordField" for="contactPasswordField">Password:</label>
+                      <input type="password" name="contactPasswordField" value="" class="contactField requiredField requiredPasswordField" id="contactPasswordField"/>
+                    </div>
+                    <div class="formSubmitButtonErrorsWrap">
+       	    			<input type="submit" class="buttonWrap button-minimal grey-minimal contactSubmitButton" id="contactSubmitButton" value="LOGIN" data-formId="contactForm"/>
+                    </div>
+			  </fieldset>
+			</form>       
+	</div>
+	<div class="fbLogin">
+		<div class="decoration"></div>
+		<div class="loginLoader" style="display:none; height:30px;width: 100%; background-image: url('images/status.gif'); background-repeat:no-repeat; background-position:center; background-size:20px;"></div>
+		<div onclick="login()"><img src="images/login_facebook.png" alt="facebook login" width="320"></div>
+	</div>
+	<div class="decoration" style="margin-top:20px;"></div>
+  </div>    
+    <p >NON HAI ANCORA UN ACCOUNT? <a href="signup.html" style="font-weight:bold;">REGISTRATI ADESSO</a></p>
+    <p style="margin-bottom:100px;">NON RICORDI LA PASSWORD? <a href="http://www.fidywallet.com/recupera_password.php" target="_blank" style="font-weight:bold;">RECUPERA PASSWORD</a></p>          
+</div>
+<div class="footer">
+    <p class="copyright">Copyright 2013. All rights reserved!</p>
+</div>
+
+</body>
+</html>

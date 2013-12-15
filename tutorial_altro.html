@@ -1,0 +1,133 @@
+<!DOCTYPE html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--Declare page as mobile friendly --> 
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0"/>
+<!-- Declare page as iDevice WebApp friendly -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<!-- iDevice WebApp Splash Screen, Regular Icon, iPhone, iPad, iPod Retina Icons -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="../images/splash/splash-icon.png"> 
+<!-- iPhone 3, 3Gs -->
+<link rel="apple-touch-startup-image" href="images/splash/splash-screen.png" 			media="screen and (max-device-width: 320px)" /> 
+<!-- iPhone 4 -->
+<link rel="apple-touch-startup-image" href="images/splash/splash-screen@2x.png" 		media="(max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2)" /> 
+<!-- iPhone 5 -->
+<link rel="apple-touch-startup-image" sizes="640x1096" href="../images/splash/splash-screen@3x.png" />
+
+<!-- Page Title -->
+<title>Fidy Wallet</title>
+
+<!-- Stylesheet Load -->
+<link href="styles/style.css"				rel="stylesheet" type="text/css">
+<link href="styles/framework-style.css" 	rel="stylesheet" type="text/css">
+<link href="styles/framework.css" 			rel="stylesheet" type="text/css">
+<link href="styles/bxslider.css"			rel="stylesheet" type="text/css">
+<link href="styles/swipebox.css"			rel="stylesheet" type="text/css">
+<link href="styles/icons.css"				rel="stylesheet" type="text/css">
+<link href="styles/retina.css" 				rel="stylesheet" type="text/css" media="only screen and (-webkit-min-device-pixel-ratio: 2)" />
+
+
+<!--Page Scripts Load -->
+<script src="scripts/jquery.min.js"							type="text/javascript"></script>	
+<script src="scripts/hammer.js"								type="text/javascript"></script>	
+<script src="scripts/jquery-ui-min.js"  					type="text/javascript"></script>
+<script src="scripts/jQuery.fastClick.js"					type="text/javascript"></script>
+<script src='scripts/html5sql.js'							type='text/javascript'></script>
+<script src="scripts/subscribe.js"							type="text/javascript"></script>
+<script src="scripts/contact.js"							type="text/javascript"></script>
+<script src="scripts/jquery.swipebox.js" 					type="text/javascript"></script>
+<script src="scripts/bxslider.js"							type="text/javascript"></script>
+<script src="scripts/colorbox.js"							type="text/javascript"></script>
+<script src="scripts/retina.js"								type="text/javascript"></script>
+<script src="scripts/custom.js"								type="text/javascript"></script>
+<script src="scripts/framework.js"							type="text/javascript"></script>
+<script src="scripts/jquery.transit.min.js"					type="text/javascript"></script>
+<script src="scripts/db.js"									type="text/javascript"></script>
+<script src="scripts/store.js"								type="text/javascript"></script>
+<script src="scripts/behavior.js"							type="text/javascript"></script>
+<script src="scripts/standard.js"							type="text/javascript"></script>
+<script src="scripts/Flux-Slider-master/js/zepto/zepto.js" type="text/javascript" charset="utf-8"></script>
+<script src="scripts/Flux-Slider-master/js/flux.min.js" type="text/javascript" charset="utf-8"></script>
+
+<style>
+	.images {
+		width:100%!important;
+	}
+	.content{
+		padding:0!important;
+	}
+	.fluxslider {
+		width:200px!important;
+	}
+</style>
+
+<script>
+$(function(){
+	if(!flux.browser.supportsTransitions)
+		//alert("Flux Slider requires a browser that supports CSS3 transitions");
+		
+	  window.myFlux = new flux.slider('.MySlider', {
+	        autoplay: false,
+	        pagination: false
+	    });
+	
+	var $slides = $('.content');
+	Hammer($slides[0]).on("swipeleft", function(e) {
+		window.myFlux.next('slide');
+      });
+
+      Hammer($slides[0]).on("swiperight", function(e) {
+		window.myFlux.prev('slide');
+      });
+     
+});
+
+
+$(document).ready(function(){
+	//set tutorial readed
+	localStorage.setItem("tutorial", "1");
+});
+</script>
+
+
+</head>
+<body style="width: 100%; background-color: #333!important;">
+
+    <div id="preloader">
+        <div id="status">
+            <p class="center-text">
+                Loading the content...
+                <em>Loading depends on your connection speed!</em>
+            </p>
+        </div>
+	</div>
+	<div class="page-wrapper">
+	<!--
+	    <div class="header">
+			<div class="header-text">
+	            <strong>SKIP THIS</strong>
+	        </div>
+		</div>
+	-->
+	
+		<div class="content" style="width: 100%; background-color: #333!important;">
+	    	<div class="MySlider">
+	            <img src="images/tutorial/fw_tutorial_01.png" alt="img" style="width: 100%;">
+        		<img src="images/tutorial/fw_tutorial_02.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_03.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_04.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_05.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_06.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_07.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_08.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_09.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_10.png" alt="img" style="width: 100%;" >
+        		<img src="images/tutorial/fw_tutorial_11.png" alt="img" style="width: 100%;" >
+	   	  	</div>
+	   	  	<div style="width:100%">
+				<a href="main.html" style="text-align:center; color: #fff;">VAI ALL'APPLICAZIONE</a>
+	   	  	</div>
+		</div>
+	</div>
+	
+</body>
+</html>
